@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #070709 !important;
+    }
+    .modern-container {
+        background-color: #070709;
+        min-height: 100vh;
+    }
+    .neon-header {
+        color: #ff3344;
+        text-shadow: 0 0 20px rgba(255, 51, 68, 0.4);
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+    .modern-card {
+        background-color: #121216 !important;
+        border: 1px solid rgba(255, 51, 68, 0.15) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    /* Эффект легкого парения для карточек отчетов */
+    .modern-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(255, 51, 68, 0.12) !important;
+        border-color: rgba(255, 51, 68, 0.3) !important;
+    }
+    .card-label {
+        color: #8a8a93;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .card-value {
+        color: #ffffff !important;
+        font-weight: 800;
+        margin-top: 0.5rem;
+        margin-bottom: 0;
+    }
+    .modern-divider {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        margin: 2.5rem 0;
+        opacity: 1;
+    }
+    /* Кастомная стилизация для плашки ежемесячных заказов */
+    .modern-alert-success {
+        background-color: rgba(25, 135, 84, 0.08) !important;
+        border: 1px solid rgba(25, 135, 84, 0.25) !important;
+        color: #2fb574 !important;
+        border-radius: 12px !important;
+        padding: 1.25rem;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="container py-5 text-white modern-container">
+
+    <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom border-secondary border-opacity-10">
+        <h2 class="m-0 neon-header">
+            ОТЧЕТЫ И АНАЛИТИКА
+        </h2>
+        <span class="badge rounded-pill px-3 py-2 fs-7" style="background-color: rgba(255, 51, 68, 0.1); color: #ff3344; border: 1px solid rgba(255, 51, 68, 0.2);">
+            Live-обновление
+        </span>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card modern-card">
+                <div class="card-body p-4">
+                    <div class="card-label">Выручка за день</div>
+                    <h2 class="card-value text-white fs-1">{{day_revenue}} ₽</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card modern-card">
+                <div class="card-body p-4">
+                    <div class="card-label">Выручка за месяц</div>
+                    <h2 class="card-value text-white fs-1">{{month_revenue}} ₽</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card modern-card">
+                <div class="card-body p-4">
+                    <div class="card-label">Бронирований всего</div>
+                    <h2 class="card-value text-white fs-1">{{reservations_count}}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modern-divider"></div>
+
+    <div class="row g-4">
+
+        <div class="col-md-3">
+            <div class="card modern-card" style="border-left: 4px solid #28a745 !important;">
+                <div class="card-body p-4">
+                    <div class="card-label">Свободные столы</div>
+                    <h3 class="card-value fw-bold fs-2 text-success">{{free_tables}}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card modern-card" style="border-left: 4px solid #ffc107 !important;">
+                <div class="card-body p-4">
+                    <div class="card-label">Забронированные</div>
+                    <h3 class="card-value fw-bold fs-2 text-warning">{{reserved_tables}}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card modern-card" style="border-left: 4px solid #dc3545 !important;">
+                <div class="card-body p-4">
+                    <div class="card-label">Занятые столики</div>
+                    <h3 class="card-value fw-bold fs-2 style-color" style="color: #ff3344 !important;">{{occupied_tables}}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card modern-card">
+                <div class="card-body p-4">
+                    <div class="card-label">Заказов сегодня</div>
+                    <h3 class="card-value text-white fs-2">{{orders_day}}</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modern-divider"></div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="modern-alert-success shadow-sm d-flex justify-content-between align-items-center">
+                <span>Заказов оформлено за текущий месяц:</span>
+                <strong class="fs-4 text-white bg-success bg-opacity-25 px-3 py-1 rounded" style="border: 1px solid rgba(40, 167, 69, 0.4);">
+                    {{orders_month}}
+                </strong>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

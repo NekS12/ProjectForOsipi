@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    body { background-color: #070709 !important; color: #e0e0e0; }
+
+    .stat-card {
+        background: #121216;
+        border: 1px solid rgba(255, 51, 68, 0.2);
+        border-radius: 20px;
+        padding: 2rem;
+        transition: 0.3s;
+    }
+
+    .stat-value { font-size: 2.5rem; font-weight: 800; color: #fff; margin: 0; }
+    .stat-label { color: #ff3344; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; font-weight: 700; }
+
+    .form-control {
+        background: #1a1a22 !important;
+        border: 2px solid #2d2d3d !important;
+        color: #fff !important;
+        border-radius: 12px !important;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+    .form-control:focus { border-color: #ff3344 !important; box-shadow: 0 0 10px rgba(255, 51, 68, 0.2); }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #ff3344, #d62839);
+        border: none;
+        padding: 1.2rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border-radius: 12px;
+        transition: 0.3s;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255, 51, 68, 0.4); }
+</style>
+
+<div class="container py-5">
+    <h2 class="neon-header mb-5 text-center">ЗАКРЫТИЕ СМЕНЫ</h2>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <div class="stat-label">Выручка по системе</div>
+                <div class="stat-value text-success">{{ total_calculated }} ₽</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <div class="stat-label">Всего кальянов</div>
+                <div class="stat-value">{{ total_hookahs }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <div class="stat-label">Расход табака</div>
+                <div class="stat-value text-danger">{{ total_hookahs * 25 }} г.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="stat-card">
+                <h4 class="mb-4 text-center">Внесите фактические данные</h4>
+                <form method="post" action="/cashbox/close">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="card-label mb-2">Наличные в кассе</label>
+                            <input type="number" step="0.01" class="form-control" name="actual_cash" placeholder="0.00" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="card-label mb-2">Оплата терминалом</label>
+                            <input type="number" step="0.01" class="form-control" name="actual_card" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="card-label mb-2">Заметки / Комментарии</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Что-то важное по смене?"></textarea>
+                    </div>
+
+                    {% if open_orders_count > 0 %}
+                    <div class="alert alert-warning border-0 mb-4 bg-warning bg-opacity-10 text-warning text-center">
+                        <i class="fas fa-exclamation-triangle"></i> Внимание: у вас еще открыто <b>{{ open_orders_count }}</b> столов!
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-submit w-100 text-white">
+                        Закрыть смену и сохранить отчет
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

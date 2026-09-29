@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #070709 !important;
+    }
+    .modern-container {
+        background-color: #070709;
+        min-height: 100vh;
+    }
+    .neon-header {
+        color: #ff3344;
+        text-shadow: 0 0 20px rgba(255, 51, 68, 0.4);
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+    .modern-card {
+        background-color: #121216 !important;
+        border: 1px solid rgba(255, 51, 68, 0.15) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+    }
+    .modern-card-header {
+        background-color: #181820 !important;
+        color: #ff4d5a !important;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        border-bottom: 1px solid rgba(255, 51, 68, 0.15) !important;
+        border-top-left-radius: 16px !important;
+        border-top-right-radius: 16px !important;
+    }
+    .modern-input, .modern-select {
+        background-color: #1a1a22 !important;
+        border: 1px solid #2d2d3d !important;
+        color: #ffffff !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    .modern-input:focus, .modern-select:focus {
+        background-color: #1f1f2a !important;
+        border-color: #ff3344 !important;
+        box-shadow: 0 0 12px rgba(255, 51, 68, 0.3) !important;
+        color: #ffffff !important;
+    }
+
+    /* Подсказки (placeholder) белые */
+    .modern-input::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+        opacity: 1;
+    }
+    .modern-input::-webkit-input-placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+    .modern-input::-moz-placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+    .modern-input:-ms-input-placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+
+    .modern-select {
+        color: #ffffff !important;
+    }
+
+    .modern-table {
+        background-color: #121216 !important;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .modern-table th {
+        background-color: #181820 !important;
+        color: #ff4d5a !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        padding: 1.2rem 1rem !important;
+        border-bottom: 2px solid rgba(255, 51, 68, 0.2) !important;
+    }
+    .modern-table td {
+        padding: 1.2rem 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+        background-color: #121216 !important;
+    }
+    .modern-table tr:hover td {
+        background-color: #181822 !important;
+    }
+
+    /* НОВЫЙ СТИЛЬ: Затемнение для отработанных карточек/строк */
+    .modern-table tr.row-disabled td {
+        opacity: 0.35 !important; /* Делаем текст полупрозрачным */
+        background-color: #0b0b0f !important; /* Затемняем фон еще сильнее */
+    }
+    .modern-table tr.row-disabled:hover td {
+        background-color: #0b0b0f !important; /* Выключаем ховер-подсветку */
+    }
+
+    /* Кнопки */
+    .btn-neon-success {
+        background-color: transparent;
+        color: #28a745;
+        border: 1px solid #28a745;
+        border-radius: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    .btn-neon-success:hover {
+        background-color: #28a745;
+        color: #fff;
+        box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+    }
+    .btn-neon-danger {
+        background-color: transparent;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    .btn-neon-danger:hover {
+        background-color: #dc3545;
+        color: #fff;
+        box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+    }
+
+    .status-badge {
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+</style>
+
+<div class="container py-5 text-white modern-container">
+
+    <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom border-secondary border-opacity-10">
+        <h2 class="m-0 neon-header">БРОНИРОВАНИЕ</h2>
+        <span class="badge rounded-pill px-3 py-2 fs-7" style="background-color: rgba(255, 51, 68, 0.1); color: #ff3344; border: 1px solid rgba(255, 51, 68, 0.2);">
+            Всего броней: {{ reservations|length }}
+        </span>
+    </div>
+
+    <div class="card modern-card mb-5">
+        <div class="card-header modern-card-header fw-bold text-uppercase p-3">
+            Новое бронирование
+        </div>
+        <div class="card-body p-4">
+            <form method="post" action="/reservations/create">
+
+                <div class="row mb-3 g-3">
+                    <div class="col-md-6">
+                        <input
+                            class="form-control modern-input text-white"
+                            name="customer_name"
+                            placeholder="Имя клиента"
+                            required>
+                    </div>
+                    <div class="col-md-6">
+                        <input
+                            class="form-control modern-input text-white"
+                            name="phone"
+                            placeholder="Телефон"
+                            required>
+                    </div>
+                </div>
+
+                <div class="row mb-3 g-3">
+                    <div class="col-md-6">
+                        <input
+                            type="number"
+                            class="form-control modern-input text-white"
+                            name="guests"
+                            placeholder="Количество гостей"
+                            required>
+                    </div>
+                    <div class="col-md-6">
+                        <input
+                            type="text"
+                            class="form-control modern-input text-white"
+                            name="reservation_time"
+                            placeholder="Дата и время (например: 06.06.2026 20:00)"
+                            required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <select name="table_id" class="form-select modern-select" required>
+                        <option value="" disabled selected hidden style="color: rgba(255, 255, 255, 0.5);">Выберите свободный столик...</option>
+                        {% for table in tables %}
+                        <option value="{{table.id}}" class="bg-dark text-white">
+                            Стол №{{table.number}} (на {{table.capacity}} чел.)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button class="btn btn-neon-success py-2 px-4">
+                    Забронировать
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="card modern-card shadow-lg">
+        <div class="table-responsive">
+            <table class="table table-dark table-borderless align-middle modern-table mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Клиент</th>
+                        <th>Телефон</th>
+                        <th>Дата и время</th>
+                        <th>Гостей</th>
+                        <th>Столик</th>
+                        <th>Статус</th>
+                        <th class="text-center">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                    <tr {% if reservation.status != "ACTIVE" %}class="row-disabled"{% endif %}>
+                        <td class="ps-4 text-muted fw-light">#{{reservation.id}}</td>
+
+                        <td class="fw-bold text-white fs-5">{{reservation.customer_name}}</td>
+                        <td class="text-white fs-5">{{reservation.phone}}</td>
+
+                        <td class="text-info fw-bold">
+                            {{ reservation.reservation_time.strftime('%d.%m.%Y %H:%M') if reservation.reservation_time else '' }}
+                        </td>
+
+                        <td>
+                            <span class="badge bg-opacity-10 bg-info text-info px-2 py-1" style="border: 1px solid rgba(13, 202, 240, 0.2);">
+                                {{reservation.guests}} чел.
+                            </span>
+                        </td>
+                        <td>
+                            <span class="fw-bold" style="color: #ff4d5a;">№{{reservation.table.number}}</span>
+                        </td>
+                        <td>
+                            {% if reservation.status == "ACTIVE" %}
+                            <span class="status-badge" style="border: 1px solid #ffc107; color: #ffc107; background-color: rgba(255, 193, 7, 0.1);">Бронь</span>
+                            {% elif reservation.status == "CHECKED_IN" %}
+                            <span class="status-badge" style="border: 1px solid #28a745; color: #28a745; background-color: rgba(40, 167, 69, 0.1);">В зале</span>
+                            {% else %}
+                            <span class="status-badge" style="border: 1px solid #dc3545; color: #dc3545; background-color: rgba(220, 53, 69, 0.1);">Отменена</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if reservation.status == "ACTIVE" %}
+                                <a class="btn btn-neon-success btn-sm mx-1 px-3 py-1" href="/reservations/checkin/{{reservation.id}}">
+                                    Пришел
+                                </a>
+                                <a class="btn btn-neon-danger btn-sm mx-1 px-3 py-1" href="/reservations/cancel/{{reservation.id}}">
+                                    Отмена
+                                </a>
+                            {% else %}
+                                <button class="btn btn-sm mx-1 px-3 py-1" style="background: transparent; border: 1px solid #222227; color: #444449; border-radius: 10px;" disabled>
+                                    Пришел
+                                </button>
+                                <button class="btn btn-sm mx-1 px-3 py-1" style="background: transparent; border: 1px solid #222227; color: #444449; border-radius: 10px;" disabled>
+                                    Отмена
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-white fw-light">
+                            Активных бронирований пока нет.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>
+    Редактирование бронирования
+</h2>
+
+<form method="post">
+
+    <div class="mb-3">
+
+        <label>Клиент</label>
+
+        <input
+            class="form-control"
+            name="customer_name"
+            value="{{reservation.customer_name}}">
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Телефон</label>
+
+        <input
+            class="form-control"
+            name="phone"
+            value="{{reservation.phone}}">
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Количество гостей</label>
+
+        <input
+            type="number"
+            class="form-control"
+            name="guests"
+            value="{{reservation.guests}}">
+
+    </div>
+
+    <button
+        class="btn btn-success">
+
+        Сохранить
+
+    </button>
+
+</form>
+
+{% endblock %}

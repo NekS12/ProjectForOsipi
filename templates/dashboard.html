@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Панель управления - Hookah Club{% endblock %}
+
+{% block content %}
+<style>
+    /* Специфичные стили для карточек дашборда */
+    .neon-header {
+        color: #ff3344;
+        text-shadow: 0 0 20px rgba(255, 51, 68, 0.4);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .modern-card {
+        background-color: #121216 !important;
+        border: 1px solid rgba(255, 51, 68, 0.15) !important;
+        border-radius: 16px !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .modern-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(255, 51, 68, 0.2) !important;
+    }
+    .card-title {
+        color: #ffffff !important;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .card-text {
+        color: #a0a0a8 !important;
+    }
+    /* Неоновые кнопки вместо дефолтных синих/зеленых */
+    .btn-neon {
+        background-color: transparent;
+        color: #ff3344;
+        border: 1px solid #ff3344;
+        border-radius: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 0.6rem 1rem;
+        transition: all 0.3s;
+    }
+    .btn-neon:hover {
+        background-color: #ff3344;
+        color: #fff;
+        box-shadow: 0 0 15px rgba(255, 51, 68, 0.5);
+    }
+</style>
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom border-secondary border-opacity-10">
+        <h2 class="m-0 neon-header">Панель управления</h2>
+    </div>
+
+    <div id="notification-area" class="container mt-3" style="display: none;">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="background-color: rgba(220, 53, 69, 0.1); border: 1px solid #dc3545; color: #ff3344;">
+            <span id="error-message"></span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div class="card modern-card mb-5">
+        <div class="card-body p-4">
+            <h3 class="card-title mb-2">Добро пожаловать, <span class="text-danger">{{ user.username if user else 'Admin' }}.</span> Откройте сначала смену</h3>
+            <p class="card-text mb-0 mt-3">
+                Системная роль:
+                <span class="badge rounded-pill px-3 py-2 ms-2" style="background-color: rgba(255, 51, 68, 0.1); color: #ff3344; border: 1px solid rgba(255, 51, 68, 0.2);">
+                    {{ user.role if user else 'OWNER' }}
+                </span>
+            </p>
+        </div>
+    </div>
+
+      <div class="card modern-card mb-4 border-2 border-danger">
+        <div class="card-body p-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="card-title m-0">Статус смены</h4>
+                {% if active_shift %}
+                    <p class="m-0 text-success fw-bold">
+                        Смена активна (открыта в {{ (active_shift.start_time + timedelta(hours=0)).strftime('%H:%M') }})
+                    </p>
+                {% else %}
+                    <p class="m-0 text-warning">Смена закрыта</p>
+                {% endif %}
+            </div>
+
+            {% if not active_shift %}
+                <button onclick="openShift()" class="btn btn-neon btn-lg">Открыть смену</button>
+            {% else %}
+                <a href="/cashbox/close-page" class="btn btn-neon btn-lg">Закрыть смену</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card modern-card h-100">
+                <div class="card-body text-center p-4 d-flex flex-column justify-content-center">
+                    <h4 class="card-title mb-4">Столики</h4>
+                    <a href="/tables" class="btn btn-neon w-100 mt-auto">Открыть</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card modern-card h-100">
+                <div class="card-body text-center p-4 d-flex flex-column justify-content-center">
+                    <h4 class="card-title mb-4">Бронирование</h4>
+                    <a href="/reservations" class="btn btn-neon w-100 mt-auto">Открыть</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card modern-card h-100">
+                <div class="card-body text-center p-4 d-flex flex-column justify-content-center">
+                    <h4 class="card-title mb-4">Заказы</h4>
+                    <a href="/orders" class="btn btn-neon w-100 mt-auto">Открыть</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card modern-card h-100">
+                <div class="card-body text-center p-4 d-flex flex-column justify-content-center">
+                    <h4 class="card-title mb-4">Отчеты</h4>
+                    <a href="/reports" class="btn btn-neon w-100 mt-auto">Открыть</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    async function openShift() {
+        try {
+            const response = await fetch('/cashbox/open', {
+                method: 'POST', // или 'GET', если твой роут /cashbox/open это позволяет
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                // Просто перезагружаем страницу, чтобы увидеть статус "Смена активна"
+                location.reload();
+            } else {
+                alert('Ошибка при открытии смены');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>
+{% endblock %}

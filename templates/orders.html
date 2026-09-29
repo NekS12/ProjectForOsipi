@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #070709 !important;
+    }
+    .modern-container {
+        background-color: #070709;
+        min-height: 100vh;
+    }
+    .neon-header {
+        color: #ff3344;
+        text-shadow: 0 0 20px rgba(255, 51, 68, 0.4);
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+    .modern-card {
+        background-color: #121216 !important;
+        border: 1px solid rgba(255, 51, 68, 0.15) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+    }
+    .modern-card-header {
+        background-color: #181820 !important;
+        color: #ff4d5a !important;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        border-bottom: 1px solid rgba(255, 51, 68, 0.15) !important;
+        border-top-left-radius: 16px !important;
+        border-top-right-radius: 16px !important;
+    }
+    .modern-input, .modern-select {
+        background-color: #1a1a22 !important;
+        border: 1px solid #2d2d3d !important;
+        color: #ffffff !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    .modern-input:focus, .modern-select:focus {
+        background-color: #1f1f2a !important;
+        border-color: #ff3344 !important;
+        box-shadow: 0 0 12px rgba(255, 51, 68, 0.3) !important;
+        color: #ffffff !important;
+    }
+
+    .modern-input::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+        opacity: 1;
+    }
+    .modern-input::-webkit-input-placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+    .modern-input::-moz-placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+    .modern-input:-ms-input-placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+
+    .modern-table {
+        background-color: #121216 !important;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .modern-table th {
+        background-color: #181820 !important;
+        color: #ff4d5a !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        padding: 1.2rem 1rem !important;
+        border-bottom: 2px solid rgba(255, 51, 68, 0.2) !important;
+    }
+    .modern-table td {
+        padding: 1.2rem 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+        background-color: #121216 !important;
+    }
+    .modern-table tr:hover td {
+        background-color: #181822 !important;
+    }
+
+    /* Затемнение для закрытых заказов */
+    .modern-table tr.row-disabled td {
+        opacity: 0.35 !important;
+        background-color: #0b0b0f !important;
+    }
+    .modern-table tr.row-disabled:hover td {
+        background-color: #0b0b0f !important;
+    }
+
+    .btn-neon-success {
+        background-color: transparent;
+        color: #28a745;
+        border: 1px solid #28a745;
+        border-radius: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    .btn-neon-success:hover {
+        background-color: #28a745;
+        color: #fff;
+        box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+    }
+    .btn-neon-danger {
+        background-color: transparent;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    .btn-neon-danger:hover {
+        background-color: #dc3545;
+        color: #fff;
+        box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+    }
+
+    .status-badge {
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+</style>
+
+<div class="container py-5 text-white modern-container">
+
+    <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom border-secondary border-opacity-10">
+        <h2 class="m-0 neon-header">ЗАКАЗЫ</h2>
+        <span class="badge rounded-pill px-3 py-2 fs-7" style="background-color: rgba(255, 51, 68, 0.1); color: #ff3344; border: 1px solid rgba(255, 51, 68, 0.2);">
+            Всего счетов: {{ orders|length }}
+        </span>
+    </div>
+
+    <div class="card modern-card mb-5">
+        <div class="card-header modern-card-header fw-bold text-uppercase p-3">
+            Новый заказ
+        </div>
+        <div class="card-body p-4">
+            <form method="post" action="/orders/create">
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-4">
+                        <label class="text-secondary mb-1" style="font-size: 0.8rem;">Стол</label>
+                        <select class="form-select modern-select" name="table_id" required>
+                            <option value="" disabled selected>Выберите стол...</option>
+                            {% for table in tables %}
+                                {# Проверяем, есть ли на столе открытый заказ #}
+                                {% set ns = namespace(has_active_order=false) %}
+                                {% for order in orders %}
+                                    {% if order.table_id == table.id and order.status == "OPEN" %}
+                                        {% set ns.has_active_order = true %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {# Показываем стол ТОЛЬКО если на нем нет открытого заказа #}
+                                {% if not ns.has_active_order %}
+                                    <option value="{{table.id}}">
+                                        Стол №{{table.number}}
+                                        {% if table.status == 'FREE' %}
+                                            (Свободен)
+                                        {% elif table.status == 'RESERVED' %}
+                                            (Бронь)
+                                        {% endif %}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="text-secondary mb-1" style="font-size: 0.8rem;">Кальян</label>
+                        <select class="form-select modern-select" name="hookah_id" required>
+                            {% for h in hookahs %}
+                            <option value="{{h.id}}">{{h.name}} ({{h.price}}₽)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="text-secondary mb-1" style="font-size: 0.8rem;">Кол-во</label>
+                        <input type="number" class="form-control modern-input text-white" name="hookahs_count" value="1" min="1" required>
+                    </div>
+
+                    <div class="col-md-2 d-grid">
+                        <button class="btn btn-neon-success fw-bold py-2">Создать</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card modern-card shadow-lg">
+        <div class="table-responsive">
+            <table class="table table-dark table-borderless align-middle modern-table mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4" style="width: 80px;">ID</th>
+                        <th>Клиент / Стол</th>
+                        <th>Сумма</th>
+                        <th>Статус</th>
+                        <th>Дата создания</th>
+                        <th class="text-center" style="width: 200px;">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr {% if order.status != "OPEN" %}class="row-disabled"{% endif %}>
+                        <td class="ps-4 text-muted fw-light">#{{order.id}}</td>
+
+                        <td class="fw-bold text-white fs-5">
+                            {% if order.reservation %}
+                                {{order.reservation.customer_name}} <span class="text-muted fs-6 fw-normal">(Стол №{{order.reservation.table.number}})</span>
+                            {% elif order.table %}
+                                Стол №{{order.table.number}}
+                            {% else %}
+                                Без стола
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="text-info fw-bold fs-5">{{order.total_price}} ₽</span>
+                        </td>
+
+                        <td>
+                            {% if order.status == "OPEN" %}
+                            <span class="status-badge" style="border: 1px solid #ffc107; color: #ffc107; background-color: rgba(255, 193, 7, 0.1);">Открыт</span>
+                            {% else %}
+                            <span class="status-badge" style="border: 1px solid #28a745; color: #28a745; background-color: rgba(40, 167, 69, 0.1);">Закрыт</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-muted small">
+                            {{ order.created_at.strftime('%d.%m.%Y %H:%M') if order.created_at.strftime else order.created_at }}
+                        </td>
+
+                        <td class="text-center">
+                            {% if order.status == "OPEN" %}
+                                <a href="/orders/close/{{order.id}}" class="btn btn-neon-success btn-sm mx-1 px-3 py-1">
+                                    Закрыть
+                                </a>
+                                <a href="/orders/delete/{{order.id}}" class="btn btn-neon-danger btn-sm mx-1 px-3 py-1" onclick="return confirm('Удалить заказ #{{ order.id }}?')">
+                                    Удалить
+                                </a>
+                            {% else %}
+                                <button class="btn btn-sm mx-1 px-3 py-1" style="background: transparent; border: 1px solid #222227; color: #444449; border-radius: 10px;" disabled>
+                                    Закрыть
+                                </button>
+                                <button class="btn btn-sm mx-1 px-3 py-1" style="background: transparent; border: 1px solid #222227; color: #444449; border-radius: 10px;" disabled>
+                                    Удалить
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-white fw-light">
+                            История заказов пуста.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
